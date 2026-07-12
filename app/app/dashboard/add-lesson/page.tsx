@@ -11,20 +11,30 @@ export default function AddLesson() {
   const [pdf, setPdf] = useState("");
 
   async function saveLesson() {
-    await addDoc(collection(db, "lessons"), {
-      courseId,
-      title,
-      video,
-      pdf,
-      createdAt: new Date(),
-    });
+    if (!courseId || !title) {
+      alert("الرجاء إدخال الكورس واسم الدرس على الأقل");
+      return;
+    }
 
-    alert("تمت إضافة الدرس");
+    try {
+      await addDoc(collection(db, "lessons"), {
+        courseId,
+        title,
+        video,
+        pdf,
+        createdAt: new Date(),
+      });
 
-    setCourseId("");
-    setTitle("");
-    setVideo("");
-    setPdf("");
+      alert("تمت إضافة الدرس بنجاح");
+
+      setCourseId("");
+      setTitle("");
+      setVideo("");
+      setPdf("");
+    } catch (error) {
+      console.error("Error adding lesson: ", error);
+      alert("حدث خطأ أثناء إضافة الدرس");
+    }
   }
 
   return (
@@ -37,6 +47,7 @@ export default function AddLesson() {
         placeholder="Course ID"
         value={courseId}
         onChange={(e) => setCourseId(e.target.value)}
+        style={{ color: "black", padding: "5px" }}
       />
 
       <br /><br />
@@ -45,6 +56,7 @@ export default function AddLesson() {
         placeholder="اسم الدرس"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        style={{ color: "black", padding: "5px" }}
       />
 
       <br /><br />
@@ -53,6 +65,7 @@ export default function AddLesson() {
         placeholder="رابط الفيديو"
         value={video}
         onChange={(e) => setVideo(e.target.value)}
+        style={{ color: "black", padding: "5px" }}
       />
 
       <br /><br />
@@ -61,9 +74,14 @@ export default function AddLesson() {
         placeholder="رابط PDF"
         value={pdf}
         onChange={(e) => setPdf(e.target.value)}
+        style={{ color: "black", padding: "5px" }}
       />
 
       <br /><br />
 
-      <button
-        
+      <button onClick={saveLesson} style={{ padding: "10px 20px", cursor: "pointer", color: "black" }}>
+        حفظ الدرس
+      </button>
+    </main>
+  );
+}
