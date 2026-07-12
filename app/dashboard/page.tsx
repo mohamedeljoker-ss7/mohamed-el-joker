@@ -89,20 +89,39 @@ export default function Dashboard() {
 
           <br />
 
-          <button
-            onClick={() => deleteCourse(course.id)}
+          <div
             style={{
-              background: "red",
-              color: "#fff",
-              padding: "10px 15px",
-              borderRadius: "8px",
+              display: "flex",
+              gap: "10px",
             }}
           >
-            حذف
-          </button>
+            <Link href={`/dashboard/edit-course/${course.id}`}>
+              <button
+                style={{
+                  background: "#16a34a",
+                  color: "#fff",
+                  padding: "10px 15px",
+                  borderRadius: "8px",
+                }}
+              >
+                ✏️ تعديل
+              </button>
+            </Link>
+
+            <button
+              onClick={() => deleteCourse(course.id)}
+              style={{
+                background: "#dc2626",
+                color: "#fff",
+                padding: "10px 15px",
+                borderRadius: "8px",
+              }}
+            >
+              🗑️ حذف
+            </button>
+          </div>
         </div>
       ))}
     </main>
   );
-            }
-      
+}
