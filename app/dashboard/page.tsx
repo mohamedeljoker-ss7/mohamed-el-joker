@@ -1,4 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export default function Dashboard() {
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  async function loadCourses() {
+    const snapshot = await getDocs(collection(db, "courses"));
+
+    const data: Course[] = [];
+
+    snapshot.forEach((course) => {
+      data.push({
+        id: course.id,
+        ...(course.data() as Omit<Course, "id">),
+      });
+    });
+
+    setCourses(data);
+  }
+
+  async function deleteCourse(id: string) {
+    if (!confirm("هل تريد حذف الكورس؟")) return;
+
+    await deleteDoc(doc(db, "courses", id));
+
+    loadCourses();
+  }
+
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
   return (
     <main
       style={{
@@ -12,57 +59,50 @@ export default function Dashboard() {
 
       <br />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-          gap: "20px",
-        }}
-      >
-        <div
+      <Link href="/dashboard/add-course">
+        <button
           style={{
-            background: "#1e293b",
-            padding: "20px",
-            borderRadius: "12px",
+            background: "#2563eb",
+            color: "#fff",
+            padding: "12px 20px",
+            borderRadius: "8px",
+            marginBottom: "20px",
           }}
         >
-          <h2>📚 الكورسات</h2>
-          <p>إدارة جميع الكورسات.</p>
-        </div>
+          ➕ إضافة كورس
+        </button>
+      </Link>
 
+      {courses.map((course) => (
         <div
+          key={course.id}
           style={{
             background: "#1e293b",
             padding: "20px",
-            borderRadius: "12px",
+            borderRadius: "10px",
+            marginBottom: "15px",
           }}
         >
-          <h2>👨‍🎓 الطلاب</h2>
-          <p>إدارة المستخدمين.</p>
-        </div>
+          <h2>{course.title}</h2>
 
-        <div
-          style={{
-            background: "#1e293b",
-            padding: "20px",
-            borderRadius: "12px",
-          }}
-        >
-          <h2>💬 الشات</h2>
-          <p>إدارة الرسائل.</p>
-        </div>
+          <p>{course.description}</p>
 
-        <div
-          style={{
-            background: "#1e293b",
-            padding: "20px",
-            borderRadius: "12px",
-          }}
-        >
-          <h2>⚙️ الإعدادات</h2>
-          <p>إعدادات المنصة.</p>
+          <br />
+
+          <button
+            onClick={() => deleteCourse(course.id)}
+            style={{
+              background: "red",
+              color: "#fff",
+              padding: "10px 15px",
+              borderRadius: "8px",
+            }}
+          >
+            حذف
+          </button>
         </div>
-      </div>
+      ))}
     </main>
   );
-}
+            }
+      
