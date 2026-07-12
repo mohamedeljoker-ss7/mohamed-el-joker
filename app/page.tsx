@@ -1,29 +1,49 @@
-export default function HomePage() {
+import Navbar from "@/components/Navbar";
+
+export default function Home() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        gap: "20px",
-      }}
-    >
-      <h1>🎓 Joker Academy</h1>
+    <>
+      <Navbar />
 
-      <p>أفضل منصة تعليمية مجانية.</p>
-
-      <button
+      <main
         style={{
-          background: "#2563eb",
-          color: "#fff",
-          padding: "12px 30px",
-          borderRadius: "10px",
+          minHeight: "90vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: "20px",
         }}
       >
-        ابدأ التعلم
-      </button>
-    </main>
+        <h1
+          style={{
+            fontSize: "50px",
+            color: "#3b82f6",
+          }}
+        >
+          Joker Academy
+        </h1>
+
+        <p
+          style={{
+            fontSize: "20px",
+          }}
+        >
+          منصة تعليمية مجانية بالكامل
+        </p>
+
+        <button
+          style={{
+            background: "#2563eb",
+            color: "#fff",
+            padding: "15px 40px",
+            borderRadius: "10px",
+            fontSize: "18px",
+          }}
+        >
+          ابدأ التعلم
+        </button>
+      </main>
+    </>
   );
 }
