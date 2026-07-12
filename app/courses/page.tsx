@@ -58,6 +58,19 @@ export default function CoursesPage() {
               marginBottom: "15px",
             }}
           >
+            {course.image && (
+  <img
+    src={course.image}
+    alt={course.title}
+    style={{
+      width: "100%",
+      maxWidth: "350px",
+      borderRadius: "10px",
+      marginBottom: "10px",
+    }}
+  />
+)}
+  
             <h2>{course.title}</h2>
 
             <p>{course.description}</p>
