@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة Mohamed Eljoker</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: #0f0f1a;
+  color: white;
+}
+header {
+  text-align: center;
+  padding: 15px;
+  position: relative;
+}
+header h1::after {
+  content: " - أهلا بك في عالم الجوكر محمد";
+  display: block;
+  font-size: 18px;
+  color: cyan;
+  margin-top: 5px;
+  animation: glow 2s infinite alternate;
+}
+@keyframes glow {
+  0% { text-shadow: 0 0 5px cyan; }
+  100% { text-shadow: 0 0 20px cyan; }
+}
+.social-icons {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: cyan;
+  color: #000;
+  text-decoration: none;
+  font-size: 26px;
+  box-shadow: 0 0 12px cyan;
+  transition: 0.3s;
+}
+.social-icons a:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 25px cyan;
+}
+.courses-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  padding: 30px;
+}
+.course-card {
+  background: #1a1a2e;
+  border-radius: 15px;
+  overflow: hidden;
+  width: 300px;
+  box-shadow: 0 0 15px cyan;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px cyan;
+}
+.course-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.course-card h3 {
+  margin: 10px 10px 5px 10px;
+  color: cyan;
+}
+.course-card p {
+  margin: 5px 10px;
+  color: #ddd;
+}
+.course-card button {
+  margin: 10px;
+  padding: 8px 15px;
+  background: cyan;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.course-card button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px cyan;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left:0; top:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.8);
+}
+.modal-content {
+  background:#1a1a2e;
+  margin: 15% auto;
+  padding:20px;
+  border-radius:15px;
+  width: 90%;
+  max-width:400px;
+  text-align:center;
+  box-shadow: 0 0 25px cyan;
+}
+.close {
+  position: absolute;
+  top:10px; right:20px;
+  color:white;
+  font-size:28px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.close:hover {color:red;}
+input[type=password] {
+  padding:10px;
+  width:80%;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
+}
+button#confirmPasswordBtn {
+  width:50%;
+  padding: 10px;
+  border-radius: 10px;
+  background: cyan;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+#chat-btn {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  width: 65px;
+  height: 65px;
+  background: cyan;
+  color: #000;
+  border-radius: 50%;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px cyan;
+  text-decoration: none;
+  z-index: 99999;
+  transition: 0.3s ease;
+}
+#chat-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px cyan;
+}
+#chat-btn span { display:none; }
+@media (min-width:768px){
+  #chat-btn{
+    width:auto;
+    height:auto;
+    border-radius:15px;
+    padding:12px 20px;
+    font-size:18px;
+  }
+  #chat-btn span{ display:inline; margin-right:5px; }
+}
+/* زر تسجيل الخروج */
+.logout-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 5px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background: cyan;
+    color: white;
+    cursor: pointer;
+    z-index: 1000;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mohamed Eljoker courses</h1>
+</header>
+
+<!-- زر تسجيل الخروج -->
+<button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+
+<main>
+  <div class="courses-container" id="coursesContainer"></div>
+</main>
+
+<a href="chat.html" id="chat-btn"><span>الدردشة</span>💬</a>
+
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h3>ادخل باسورد الكورس</h3>
+    <input type="password" id="coursePasswordInput" placeholder="باسورد الكورس">
+    <button id="confirmPasswordBtn">دخول الكورس</button>
+    <p id="passwordError" style="color:cyan; display:none;">باسورد غلط!</p>
+  </div>
+</div>
+
+<div class="social-icons">
+  <a href="https://wa.me/201010298878" target="_blank">📱</a>
+  <a href="https://t.me/Mo7amedEL_JOKER_ss7" target="_blank">📨</a>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.firebasestorage.app",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* 🔒 حماية الصفحة */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    loadCourses();
+  }
+});
+
+/* تسجيل خروج */
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+    await signOut(auth);
+    window.location.href = "login.html";
+});
+
+const coursesContainer = document.getElementById("coursesContainer");
+const passwordModal = document.getElementById("passwordModal");
+const coursePasswordInput = document.getElementById("coursePasswordInput");
+const confirmPasswordBtn = document.getElementById("confirmPasswordBtn");
+const passwordError = document.getElementById("passwordError");
+
+let selectedCourseLink = null;
+let selectedCoursePassword = null;
+
+async function loadCourses() {
+  const querySnapshot = await getDocs(collection(db, "courses"));
+  coursesContainer.innerHTML = "";
+  querySnapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const card = document.createElement("div");
+    card.className = "course-card";
+    card.innerHTML = `
+      <img src="${data.image}">
+      <h3>اسم المطور: ${data.dev}</h3>
+      <h3>${data.en}</h3>
+      <p>الوصف بالعربي: ${data.ar}</p>
+      <p>الوصف بالإنجليزي: ${data.descEn}</p>
+      <p>السعر: ${data.priceEn} | ${data.priceAr}</p>
+      <button class="enter-course-btn">دخول الكورس</button>
+    `;
+    coursesContainer.appendChild(card);
+
+    card.querySelector(".enter-course-btn").addEventListener("click", () => {
+      selectedCoursePassword = data.coursePassword;
+      selectedCourseLink = data.link;
+      passwordModal.style.display = "block";
+      coursePasswordInput.value = "";
+      passwordError.style.display = "none";
+    });
+  });
+}
+
+confirmPasswordBtn.addEventListener("click", () => {
+  if (coursePasswordInput.value === selectedCoursePassword) {
+    window.location.href = selectedCourseLink;
+  } else {
+    passwordError.style.display = "block";
+  }
+});
+
+document.getElementById("closeModal").addEventListener("click", () => {
+  passwordModal.style.display = "none";
+});
+
+window.addEventListener("click", e => {
+  if (e.target === passwordModal) passwordModal.style.display = "none";
+});
+</script>
+  <!-- index.html -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.appspot.com",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const adminEmail = "mhmdbdaltwabalsdawyaljwkr7@gmail.com";
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // المستخدم مش داخل
+    window.location.href = "login.html";
+  } else {
+    const email = user.email.trim().toLowerCase();
+    if (email === adminEmail.toLowerCase()) {
+      // الأدمن دخل بالغلط → يتحول للوحة التحكم
+      window.location.href = "admin.html";
+    }
+  }
+});
+</script>
+  
+
+</body>
+</html>
+
+
+
+  

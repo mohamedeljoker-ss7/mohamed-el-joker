@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 لوحة تحكم Mohamed Eljoker</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: white;
+}
+.admin-header {
+  background: #000;
+  padding: 20px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: cyan;
+  box-shadow: 0 0 20px cyan;
+}
+#adminPanel {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #1f2937;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0,255,255,0.2);
+  display: none;
+}
+input, textarea {
+  width: 95%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: none;
+}
+button {
+  padding: 10px 15px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.add-btn { background: cyan; color: black; }
+.delete-btn { background: red; color: white; }
+.edit-btn { background: orange; color: black; }
+.save-btn { background: green; color: white; }
+.card {
+  background: #111827;
+  padding: 15px;
+  width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+  margin-bottom: 15px;
+}
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.edit-form { display: none; margin-top: 10px; }
+.logout-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0,255,255,0.5);
+  transition: 0.3s;
+}
+.logout-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0,255,255,0.8);
+}
+.loading {
+  text-align: center;
+  margin-top: 100px;
+  color: cyan;
+  font-size: 20px;
+}
+
+/* شاشة إدخال الباسورد */
+#passwordScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.97);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#passwordScreen input {
+  width: 250px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  background: #111827;
+  color: white;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+#passwordScreen button {
+  background: cyan;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: black;
+}
+</style>
+</head>
+<body>
+
+<div id="passwordScreen">
+  <h2>🔐 أدخل كلمة سر لوحة التحكم</h2>
+  <input type="password" id="adminPassword" placeholder="••••••••••">
+  <button onclick="checkPassword()">دخول</button>
+  <p id="passMessage" style="color:red;font-weight:bold;"></p>
+</div>
+
+<div class="admin-header" style="display:none;">👑 لوحة تحكم Mohamed Eljoker</div>
+<button class="logout-btn" id="logoutBtn" style="display:none;">تسجيل خروج</button>
+
+<div id="adminPanel">
+  <h2>إضافة كورس جديد</h2>
+  <input id="devName" placeholder="اسم المطور" value="MohamedElJoker88">
+  <input id="courseEn" placeholder="اسم الكورس بالإنجليزي">
+  <input id="courseAr" placeholder="اسم الكورس بالعربي">
+  <textarea id="descEn" placeholder="وصف الكورس بالإنجليزي"></textarea>
+  <textarea id="descAr" placeholder="وصف الكورس بالعربي"></textarea>
+  <input id="priceEn" placeholder="السعر بالإنجليزي">
+  <input id="priceAr" placeholder="السعر بالعربي">
+  <input id="category" placeholder="الفئة">
+  <input id="link" placeholder="رابط الكورس (فيديو أو تحميل)">
+  <input id="image" placeholder="رابط صورة الكورس">
+  <input id="coursePassword" placeholder="باسورد الكورس">
+  <button class="add-btn" onclick="addCourse()">إضافة كورس</button>
+  <button class="delete-btn" onclick="deleteAllCourses()">مسح كل الكورسات</button>
+
+  <h2>كورساتك</h2>
+  <div class="container" id="myCourses"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.appspot.com",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ✅ كلمة السر السرّية (غيّرها لو حبيت)
+const ADMIN_PASSWORD = "joker@admin2026";
+
+window.checkPassword = function() {
+  const input = document.getElementById("adminPassword").value.trim();
+  const msg = document.getElementById("passMessage");
+  if (input === ADMIN_PASSWORD) {
+    document.getElementById("passwordScreen").style.display = "none";
+    document.querySelector(".admin-header").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "block";
+    document.getElementById("adminPanel").style.display = "block";
+    loadCourses();
+  } else {
+    msg.textContent = "❌ كلمة السر غير صحيحة";
+  }
+};
+
+// ➕ إضافة كورس
+window.addCourse = async function() {
+  await addDoc(collection(db, "courses"), {
+    dev: document.getElementById("devName").value,
+    en: document.getElementById("courseEn").value,
+    ar: document.getElementById("courseAr").value,
+    descEn: document.getElementById("descEn").value,
+    descAr: document.getElementById("descAr").value,
+    priceEn: document.getElementById("priceEn").value,
+    priceAr: document.getElementById("priceAr").value,
+    category: document.getElementById("category").value,
+    link: document.getElementById("link").value,
+    image: document.getElementById("image").value,
+    coursePassword: document.getElementById("coursePassword").value
+  });
+  alert("✅ تم إضافة الكورس بنجاح");
+  loadCourses();
+};
+
+// 📥 تحميل الكورسات
+async function loadCourses() {
+  const container = document.getElementById("myCourses");
+  container.innerHTML = "";
+  const snap = await getDocs(collection(db, "courses"));
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${data.image}">
+      <h3>${data.en}</h3>
+      <p>${data.priceEn} | ${data.priceAr}</p>
+      <p>${data.category}</p>
+      <p>🔑 الباسورد: ${data.coursePassword}</p>
+      <button class="edit-btn">تعديل</button>
+      <button class="delete-btn">حذف</button>
+      <div class="edit-form">
+        <input class="editEn" value="${data.en}">
+        <input class="editAr" value="${data.ar}">
+        <textarea class="editDescEn">${data.descEn}</textarea>
+        <textarea class="editDescAr">${data.descAr}</textarea>
+        <input class="editPriceEn" value="${data.priceEn}">
+        <input class="editPriceAr" value="${data.priceAr}">
+        <input class="editCategory" value="${data.category}">
+        <input class="editLink" value="${data.link}">
+        <input class="editImage" value="${data.image}">
+        <input class="editPassword" value="${data.coursePassword}">
+        <button class="save-btn">حفظ التعديل</button>
+      </div>
+    `;
+    container.appendChild(card);
+
+    // تعديل الكورس
+    card.querySelector(".edit-btn").addEventListener("click", () => {
+      const form = card.querySelector(".edit-form");
+      form.style.display = form.style.display === "block" ? "none" : "block";
+    });
+
+    // حفظ التعديل
+    card.querySelector(".save-btn").addEventListener("click", async () => {
+      await updateDoc(doc(db, "courses", id), {
+        en: card.querySelector(".editEn").value,
+        ar: card.querySelector(".editAr").value,
+        descEn: card.querySelector(".editDescEn").value,
+        descAr: card.querySelector(".editDescAr").value,
+        priceEn: card.querySelector(".editPriceEn").value,
+        priceAr: card.querySelector(".editPriceAr").value,
+        category: card.querySelector(".editCategory").value,
+        link: card.querySelector(".editLink").value,
+        image: card.querySelector(".editImage").value,
+        coursePassword: card.querySelector(".editPassword").value
+      });
+      alert("✅ تم حفظ التعديل");
+      loadCourses();
+    });
+
+    // حذف الكورس
+    card.querySelector(".delete-btn").addEventListener("click", async () => {
+      if (confirm("هل تريد حذف هذا الكورس؟")) {
+        await deleteDoc(doc(db, "courses", id));
+        alert("🗑️ تم الحذف");
+        loadCourses();
+      }
+    });
+  });
+}
+
+// 🔘 تسجيل الخروج
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  if (confirm("هل تريد تسجيل الخروج؟")) {
+    location.reload();
+  }
+});
+</script>
+
+</body>
+</html>

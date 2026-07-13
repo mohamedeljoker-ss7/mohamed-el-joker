@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول - منصة Mohamed Eljoker</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 50px 20px;
+}
+.container {
+  max-width: 400px;
+  margin: auto;
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px cyan;
+}
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  background: #111827;
+  color: white;
+}
+button {
+  background: cyan;
+  color: black;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 0 15px cyan;
+  transition: 0.3s;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px cyan;
+}
+.message {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #ff6666;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🔐 تسجيل الدخول</h2>
+  <input type="email" id="email" placeholder="البريد الإلكتروني">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <br>
+  <button id="loginBtn">تسجيل الدخول</button>
+  <button id="signupBtn">إنشاء حساب جديد</button>
+  <p class="message" id="message"></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { 
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  onAuthStateChanged, setPersistence, browserLocalPersistence 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.appspot.com",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+// 🔹 تشغيل Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔹 نخلي الجلسة محفوظة دائمًا حتى بعد غلق المتصفح
+await setPersistence(auth, browserLocalPersistence);
+
+// 🔹 البريد الخاص بلوحة التحكم
+const adminEmail = "mhmdbdaltwabalsdawyaljwkr7@gmail.com";
+
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const msg = document.getElementById("message");
+
+// 🔸 تسجيل الدخول
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim().toLowerCase();
+  const password = passInput.value.trim();
+
+  if (!email || !password) {
+    msg.textContent = "⚠️ من فضلك أدخل البريد وكلمة المرور";
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    redirectUser(email);
+  } catch (error) {
+    msg.textContent = "❌ خطأ في تسجيل الدخول، تأكد من البيانات";
+  }
+});
+
+// 🔸 إنشاء حساب جديد (غير متاح للأدمن)
+signupBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim().toLowerCase();
+  const password = passInput.value.trim();
+
+  if (!email || !password) {
+    msg.textContent = "⚠️ من فضلك أدخل البريد وكلمة المرور";
+    return;
+  }
+
+  if (email === adminEmail.toLowerCase()) {
+    msg.textContent = "🚫 لا يمكن إنشاء حساب بهذا البريد (خاص بالأدمن)";
+    return;
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    msg.style.color = "lime";
+    msg.textContent = "✅ تم إنشاء الحساب بنجاح، جاري تحويلك...";
+    setTimeout(() => redirectUser(email), 1500);
+  } catch (error) {
+    msg.textContent = "❌ البريد مستخدم بالفعل أو كلمة المرور ضعيفة";
+  }
+});
+
+// 🔸 التوجيه الذكي بعد تسجيل الدخول
+function redirectUser(email) {
+  if (email === adminEmail.toLowerCase()) {
+    window.location.href = "admin.html";
+  } else {
+    window.location.href = "index.html";
+  }
+}
+
+// 🔹 الدخول التلقائي لو المستخدم مسجل بالفعل
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    redirectUser(user.email.toLowerCase());
+  }
+});
+</script>
+
+</body>
+</html>
