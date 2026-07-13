@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>تشغيل الفيديو</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.logout-btn { position: fixed; top: 15px; right: 15px; background: cyan; color: white; padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px red; z-index: 9999; }
+</style>
+</head>
+<body>
+
+<h1>تشغيل الفيديو</h1>
+<button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+<video id="courseVideo" width="100%" height="auto" controls></video>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.firebasestorage.app",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  } else {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoFile = urlParams.get("video");
+    if(videoFile){
+      document.getElementById("courseVideo").src = videoFile;
+    } else {
+      document.body.innerHTML = "<h2>لا يوجد فيديو</h2>";
+    }
+  }
+});
+
+/* زر تسجيل الخروج */
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

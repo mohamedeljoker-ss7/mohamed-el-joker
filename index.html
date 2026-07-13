@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة Mohamed Eljoker</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* بعض الأنماط المحلية للبساطة (الـ style.css يحتوي على بقية التنسيقات) */
+.logout-btn{ position: fixed; top: 15px; left: 15px; padding: 5px 10px; font-size: 14px; border: none; border-radius: 5px; background: cyan; color: white; cursor: pointer; z-index: 1000; display:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="platformTitle">Mohamed Eljoker courses</h1>
+</header>
+
+<button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+
+<main>
+  <div class="courses-container" id="coursesContainer"></div>
+</main>
+
+<a href="chat.html" id="chat-btn"><span>الدردشة</span>💬</a>
+
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h3>ادخل باسورد الكورس</h3>
+    <input type="password" id="coursePasswordInput" placeholder="باسورد الكورس">
+    <button id="confirmPasswordBtn">دخول الكورس</button>
+    <p id="passwordError" style="color:cyan; display:none;">باسورد غلط!</p>
+  </div>
+</div>
+
+<div class="social-icons">
+  <a href="https://wa.me/201010298878" target="_blank">📱</a>
+  <a href="https://t.me/Mo7amedEL_JOKER_ss7" target="_blank">📨</a>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.firebasestorage.app",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const coursesContainer = document.getElementById("coursesContainer");
+const passwordModal = document.getElementById("passwordModal");
+const coursePasswordInput = document.getElementById("coursePasswordInput");
+const confirmPasswordBtn = document.getElementById("confirmPasswordBtn");
+const passwordError = document.getElementById("passwordError");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let selectedCourseLink = null;
+let selectedCoursePassword = null;
+
+// إظهار زر الخروج لو فيه مستخدم مسجل
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    logoutBtn.style.display = "block";
+  } else {
+    logoutBtn.style.display = "none";
+  }
+});
+
+// تسجيل خروج لو ضغط عليه الأدمن أو أي مستخدم
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "login.html";
+});
+
+async function loadCourses() {
+  const querySnapshot = await getDocs(collection(db, "courses"));
+  coursesContainer.innerHTML = "";
+  querySnapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const card = document.createElement("div");
+    card.className = "course-card";
+    card.innerHTML = `
+      <img src="${data.image}">
+      <h3>اسم المطور: ${data.dev}</h3>
+      <h3>${data.en}</h3>
+      <p>الوصف بالعربي: ${data.ar}</p>
+      <p>الوصف بالإنجليزي: ${data.descEn}</p>
+      <p>السعر: ${data.priceEn} | ${data.priceAr}</p>
+      <button class="enter-course-btn">دخول الكورس</button>
+    `;
+    coursesContainer.appendChild(card);
+
+    card.querySelector(".enter-course-btn").addEventListener("click", () => {
+      selectedCoursePassword = data.coursePassword;
+      selectedCourseLink = data.link;
+      passwordModal.style.display = "block";
+      coursePasswordInput.value = "";
+      passwordError.style.display = "none";
+    });
+  });
+}
+
+confirmPasswordBtn.addEventListener("click", () => {
+  if (coursePasswordInput.value === selectedCoursePassword) {
+    // افتح رابط الكورس (يمكن يكون صفحة داخلية أو لينك خارجي)
+    window.location.href = selectedCourseLink;
+  } else {
+    passwordError.style.display = "block";
+  }
+});
+
+document.getElementById("closeModal").addEventListener("click", () => {
+  passwordModal.style.display = "none";
+});
+
+window.addEventListener("click", e => {
+  if (e.target === passwordModal) passwordModal.style.display = "none";
+});
+
+// تحميل الكورسات عامة (بدون اشتراط تسجيل دخول)
+loadCourses();
+</script>
+
+</body>
+</html>

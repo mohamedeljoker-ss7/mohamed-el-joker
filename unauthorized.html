@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🚫 غير مصرح بالدخول</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { margin:0; padding:0; font-family: "Cairo", sans-serif; background: radial-gradient(circle at top, #071022, #000); color:#fff; height:100vh; display:flex; align-items:center; justify-content:center; }
+.card { background: linear-gradient(180deg,#071226 0%, #0f172a 100%); padding:30px; border-radius:14px; text-align:center; box-shadow: 0 12px 40px rgba(0,255,255,0.06); width:95%; max-width:520px; }
+.icon { width:120px; height:120px; margin:-60px auto 10px; border-radius:50%; background: radial-gradient(circle,#ffcc00,#ff6b00); display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 30px rgba(255,107,0,0.12); animation: pulse 1.6s infinite; }
+.icon svg { width:64px; height:64px; }
+@keyframes pulse { 0% { transform: scale(0.95); } 50% { transform: scale(1.06); } 100% { transform: scale(0.95); } }
+h1{ color:cyan; margin:10px 0; font-size:24px; }
+p { color:#cfd8de; margin-bottom:18px; font-size:16px; }
+.actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn { background:cyan; color:#000; border:none; padding:12px 22px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:0 6px 18px rgba(0,255,255,0.08); }
+.btn.secondary { background:transparent; color:#cfd8de; border:1px solid rgba(255,255,255,0.06); }
+.btn:hover { transform:translateY(-3px); }
+.small { font-size:13px; color:#9fb3bd; margin-top:12px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" role="img" aria-label="تحذير">
+      <!-- أيقونة تنبيه -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a1.5 1.5 0 0 0 1.29 2.25h17.78a1.5 1.5 0 0 0 1.29-2.25L13.71 3.86a1.5 1.5 0 0 0-2.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+
+    <h1>🚫 غير مصرح لك بدخول لوحة التحكم</h1>
+    <p>هذه الصفحة مخصصة للمسؤول فقط. إذا كان لديك حساب مسؤول، فضلاً سجّل الدخول أولاً.</p>
+
+    <div class="actions">
+      <button class="btn" onclick="location.href= login.html ">🔑 تسجيل الدخول</button>
+      <button class="btn secondary" onclick="location.href= index.html ">🏠 العودة إلى الصفحة الرئيسية</button>
+    </div>
+
+    <div class="small">إذا وصلت إلى هذه الصفحة عن طريق الرابط المباشر، تأكد أنك تستخدم الحساب الصحيح للأدمن.</div>
+  </div>
+</body>
+</html>

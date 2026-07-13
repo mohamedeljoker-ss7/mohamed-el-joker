@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>تسجيل الدخول - Mohamed Eljoker</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background:#0f0f1a;
+}
+.login-box {
+  background: #1a1a2e;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 25px cyan;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+.login-box h2 {
+  color: cyan;
+  margin-bottom: 20px;
+}
+.login-box input {
+  width: 90%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  text-align: center;
+}
+.login-box button {
+  width: 95%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: cyan;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+.toggle-link {
+  margin-top: 15px;
+  display: block;
+  cursor: pointer;
+  color: cyan;
+  font-size: 14px;
+}
+.msg {
+  margin-top: 15px;
+  font-weight: bold;
+  display: none;
+}
+.success { color: lime; }
+.error { color: red; }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h2 id="formTitle">تسجيل الدخول</h2>
+  <input type="email" id="email" placeholder="البريد الإلكتروني">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <button id="submitBtn">دخول</button>
+  <span class="toggle-link" id="toggleForm">ليس لديك حساب؟ إنشاء حساب جديد</span>
+  <div id="msg" class="msg"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  browserSessionPersistence
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCi7QFutixJEkVlc21-k2ELnkEceqML-w",
+  authDomain: "mohamedeljokerweb.firebaseapp.com",
+  projectId: "mohamedeljokerweb",
+  storageBucket: "mohamedeljokerweb.firebasestorage.app",
+  messagingSenderId: "190296400698",
+  appId: "1:190296400698:web:517c0daf88e74e1c4b6603"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+await setPersistence(auth, browserSessionPersistence);
+
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const submitBtn = document.getElementById("submitBtn");
+const toggleForm = document.getElementById("toggleForm");
+const formTitle = document.getElementById("formTitle");
+const msgBox = document.getElementById("msg");
+
+let isLogin = true;
+
+// التبديل بين تسجيل الدخول وإنشاء الحساب
+toggleForm.addEventListener("click", () => {
+  isLogin = !isLogin;
+  formTitle.textContent = isLogin ? "تسجيل الدخول" : "إنشاء حساب";
+  submitBtn.textContent = isLogin ? "دخول" : "إنشاء حساب";
+  toggleForm.textContent = isLogin
+    ? "ليس لديك حساب؟ إنشاء حساب جديد"
+    : "لديك حساب بالفعل؟ تسجيل الدخول";
+  msgBox.style.display = "none";
+});
+
+// زر التنفيذ
+submitBtn.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  msgBox.style.display = "none";
+
+  if (!email || !password) {
+    showMsg("من فضلك أدخل كل البيانات", "error");
+    return;
+  }
+
+  try {
+    if (isLogin) {
+      await signInWithEmailAndPassword(auth, email, password);
+      showMsg("✅ تم تسجيل الدخول بنجاح", "success");
+    } else {
+      await createUserWithEmailAndPassword(auth, email, password);
+      showMsg("✅ تم إنشاء الحساب بنجاح", "success");
+    }
+  } catch (error) {
+    showMsg(parseError(error), "error");
+  }
+});
+
+function showMsg(message, type) {
+  msgBox.textContent = message;
+  msgBox.className = "msg " + type;
+  msgBox.style.display = "block";
+}
+
+function parseError(error) {
+  const code = error.code || "";
+  if (code.includes("auth/wrong-password")) return "❌ كلمة المرور غير صحيحة";
+  if (code.includes("auth/user-not-found")) return "❌ المستخدم غير موجود";
+  if (code.includes("auth/invalid-email")) return "❌ البريد غير صالح";
+  if (code.includes("auth/email-already-in-use")) return "❌ البريد مستخدم بالفعل";
+  if (code.includes("auth/weak-password")) return "❌ كلمة المرور ضعيفة";
+  return "❌ حدث خطأ: " + error.message;
+}
+</script>
+
+</body>
+</html>
