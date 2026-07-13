@@ -1,4 +1,5 @@
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata = {
   title: "Joker Academy",
@@ -12,7 +13,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body>{children}</body>
+      <body
+        style={{
+          margin: 0,
+          background: "#0f172a",
+          color: "#fff",
+        }}
+      >
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
